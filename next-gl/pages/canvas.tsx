@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react'
 import clearColor from "../utils/ClearColor"
 import checkKey from "../utils/CheckKey"
 
-const Home: NextPage = () => {
+const Canvas: NextPage = () => {
     const [gl, setGl] = useState<WebGLRenderingContext | null>(null)
     useEffect(() => {
         const canvas = document.getElementById("canvas") as HTMLCanvasElement
@@ -39,4 +39,4 @@ const Home: NextPage = () => {
   )
 }
 
-export default Home
+export default Canvas
