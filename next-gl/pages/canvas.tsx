@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 
 import clearColor from "../utils/ClearColor"
 import checkKey from "../utils/CheckKey"
+import drawSquare from "../utils/Square"
 
 const Canvas: NextPage = () => {
     const [gl, setGl] = useState<WebGLRenderingContext | null>(null)
@@ -18,6 +19,9 @@ const Canvas: NextPage = () => {
             
             clearColor(gl, checkKey(event.keyCode))
         })
+        if(gl){
+          drawSquare(gl)
+        }
     })
   return (
     <div className={styles.container}>
