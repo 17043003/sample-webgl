@@ -1,3 +1,5 @@
+import getShader from "./prepareShader"
+
 const drawSquare = (gl: WebGLRenderingContext) => {
     const vertices = [
         -0.5, 0.5, 0.0,
@@ -19,8 +21,6 @@ const drawSquare = (gl: WebGLRenderingContext) => {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-    const program = gl.createProgram()
 
     // prepare shader
     const vertexShader = `#version 300 es
@@ -47,16 +47,13 @@ const drawSquare = (gl: WebGLRenderingContext) => {
     }
     `
 
-    let vShader = gl.createShader(gl.VERTEX_SHADER);
+    const vShader = getShader(gl, vertexShader)
     if(!vShader) return;
-    gl.shaderSource(vShader, vertexShader)
-    gl.compileShader(vShader)
 
-    let fShader = gl.createShader(gl.FRAGMENT_SHADER);
+    const fShader = getShader(gl, fragmentShader)
     if(!fShader) return;
-    gl.shaderSource(fShader, fragmentShader)
-    gl.compileShader(fShader)
 
+    const program = gl.createProgram()
     if(!program) return;
     gl.attachShader(program, vShader)
     gl.attachShader(program, fShader)
