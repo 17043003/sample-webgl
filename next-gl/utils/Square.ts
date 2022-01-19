@@ -1,4 +1,4 @@
-import getShader from "./prepareShader"
+import prepareShader from "./prepareShader"
 
 const drawSquare = (gl: WebGLRenderingContext) => {
     const vertices = [
@@ -47,10 +47,10 @@ const drawSquare = (gl: WebGLRenderingContext) => {
     }
     `
 
-    const vShader = getShader(gl, vertexShader)
+    const vShader = prepareShader(gl, "vertex", vertexShader)
     if(!vShader) return;
 
-    const fShader = getShader(gl, fragmentShader)
+    const fShader = prepareShader(gl, "fragment", fragmentShader)
     if(!fShader) return;
 
     const program = gl.createProgram()
