@@ -1,5 +1,6 @@
 import initBuffer from "../utils/initBuffer"
 import prepareShader from "./prepareShader"
+import initProgram, { programReturn } from "../utils/initProgram"
 
 const drawSquare = (gl: WebGLRenderingContext) => {
     const vertices = [
@@ -46,19 +47,12 @@ const drawSquare = (gl: WebGLRenderingContext) => {
     const fShader = prepareShader(gl, "fragment", fragmentShader)
     if(!fShader) return;
 
-    const program = gl.createProgram()
-    if(!program) return;
-    gl.attachShader(program, vShader)
-    gl.attachShader(program, fShader)
-    gl.linkProgram(program)
-
-    gl.useProgram(program)
+    const [program, aVertexPosition]: programReturn | [null, null] = initProgram(gl, vShader, fShader)
+    if(!program || aVertexPosition) return;
 
     // draw
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     gl.viewport(0, 0, 900, 700)
-
-    const aVertexPosition = gl.getAttribLocation(program, 'aVertexPosition')
 
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
     gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, false, 0, 0)
