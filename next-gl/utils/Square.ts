@@ -1,6 +1,7 @@
 import initBuffer from "../utils/initBuffer"
 import prepareShader from "./prepareShader"
 import initProgram, { programReturn } from "../utils/initProgram"
+import draw from "../utils/draw"
 
 const drawSquare = (gl: WebGLRenderingContext) => {
     const vertices = [
@@ -51,18 +52,8 @@ const drawSquare = (gl: WebGLRenderingContext) => {
     if(!program || aVertexPosition) return;
 
     // draw
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-    gl.viewport(0, 0, 900, 700)
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
-    gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(aVertexPosition)
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
-    gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0)
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, null)
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
+    if(!positionBuffer || !indexBuffer) return;
+    draw(gl, positionBuffer, indexBuffer, aVertexPosition, indices.length)
 }
 
 export default drawSquare
