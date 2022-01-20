@@ -1,3 +1,4 @@
+import initBuffer from "../utils/initBuffer"
 import prepareShader from "./prepareShader"
 
 const drawSquare = (gl: WebGLRenderingContext) => {
@@ -11,16 +12,8 @@ const drawSquare = (gl: WebGLRenderingContext) => {
     const indices = [0, 1, 2, 0, 2, 3]
 
     // init buffer
-    const positionBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
-
-    const indexBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW)
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    const positionBuffer = initBuffer(gl, "vertex", vertices)
+    const indexBuffer = initBuffer(gl, "index", indices)
 
     // prepare shader
     const vertexShader = `#version 300 es
