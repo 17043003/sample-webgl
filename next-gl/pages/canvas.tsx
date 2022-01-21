@@ -10,7 +10,7 @@ import drawSquare from "../utils/Square"
 import drawPentagon from "../utils/Pentagon"
 
 const Canvas: NextPage = () => {
-    const [gl, setGl] = useState<WebGLRenderingContext | null>(null)
+    const [gl, setGl] = useState<WebGL2RenderingContext | null>(null)
     useEffect(() => {
         const canvas = document.getElementById("canvas") as HTMLCanvasElement
         setGl(canvas?.getContext('webgl2'))

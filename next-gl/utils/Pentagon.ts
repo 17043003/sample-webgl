@@ -3,7 +3,7 @@ import prepareShader from "./prepareShader"
 import initProgram, { programReturn } from "../utils/initProgram"
 import draw from "../utils/draw"
 
-const drawPentagon = (gl: WebGLRenderingContext) => {
+const drawPentagon = (gl: WebGL2RenderingContext) => {
     const vertices = [
         -0.3, -0.5, 0.0,
         0.3, -0.5, 0.0,

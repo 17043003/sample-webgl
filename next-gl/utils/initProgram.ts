@@ -1,6 +1,6 @@
 export type programReturn = [WebGLProgram, number]
 
-const initProgram = (gl: WebGLRenderingContext, vShader: WebGLShader, fShader: WebGLShader): programReturn | [null, null] => {
+const initProgram = (gl: WebGL2RenderingContext, vShader: WebGLShader, fShader: WebGLShader): programReturn | [null, null] => {
     const program = gl.createProgram()
     if(!program) return [null, null];
     gl.attachShader(program, vShader)

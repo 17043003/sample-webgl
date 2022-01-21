@@ -3,7 +3,7 @@ import prepareShader from "./prepareShader"
 import initProgram, { programReturn } from "../utils/initProgram"
 import draw from "../utils/draw"
 
-const drawSquare = (gl: WebGLRenderingContext) => {
+const drawSquare = (gl: WebGL2RenderingContext) => {
     const vertices = [
         -0.5, 0.5, 0.0,
         -0.5, -0.5, 0.0,

@@ -1,6 +1,6 @@
 type clearColorType = {
     (
-        gl: WebGLRenderingContext, 
+        gl: WebGL2RenderingContext, 
         color: [number, number, number, number],
     ): void
 }

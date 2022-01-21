@@ -1,4 +1,4 @@
-const initBuffer = (gl: WebGLRenderingContext, type: "vertex" | "index", array: number[]) => {
+const initBuffer = (gl: WebGL2RenderingContext, type: "vertex" | "index", array: number[]) => {
     const buffer = gl.createBuffer()
     if(type === "vertex"){
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer)

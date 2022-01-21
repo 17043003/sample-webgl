@@ -1,4 +1,4 @@
-const draw = (gl: WebGLRenderingContext, positionBuffer: WebGLBuffer, indexBuffer: WebGLBuffer, aVertexPosition: number, indexLength: number) => {
+const draw = (gl: WebGL2RenderingContext, positionBuffer: WebGLBuffer, indexBuffer: WebGLBuffer, aVertexPosition: number, indexLength: number) => {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     gl.viewport(0, 0, 900, 700)
 

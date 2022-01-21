@@ -1,4 +1,4 @@
-const prepareShader = (gl: WebGLRenderingContext, shaderType: "vertex" | "fragment", shaderScript: string) => {
+const prepareShader = (gl: WebGL2RenderingContext, shaderType: "vertex" | "fragment", shaderScript: string) => {
     let shader: WebGLShader | null;
     if(shaderType === "vertex"){
         shader = gl.createShader(gl.VERTEX_SHADER)
