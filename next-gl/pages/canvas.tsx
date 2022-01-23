@@ -20,7 +20,6 @@ const Canvas: NextPage = () => {
           canvas.width = window.innerWidth
           canvas.height = window.innerHeight
         }
-        // resizeCanvas()
 
         const keydownCallBack = (event: any) => {
             if(!gl) return

@@ -2,6 +2,8 @@ import initBuffer from "../utils/initBuffer"
 import prepareShader from "./prepareShader"
 import initProgram, { programReturn } from "../utils/initProgram"
 import draw from "../utils/draw"
+import initVAO from "../utils/initVAOBuffer"
+import drawWithVAO from "../utils/drawWithVAO"
 
 const drawPentagon = (gl: WebGL2RenderingContext) => {
     const vertices = [
@@ -14,8 +16,8 @@ const drawPentagon = (gl: WebGL2RenderingContext) => {
 
     const indices = [0, 1, 3, 0, 3, 4, 1, 2, 3]
 
-    const vBuffer = initBuffer(gl, "vertex", vertices)
-    const iBuffer = initBuffer(gl, "index", indices)
+    // const vBuffer = initBuffer(gl, "vertex", vertices)
+    // const iBuffer = initBuffer(gl, "index", indices)
 
     // prepare shader
     const vertexShader = `#version 300 es
@@ -51,9 +53,13 @@ const drawPentagon = (gl: WebGL2RenderingContext) => {
     const [program, aVertexPosition]: programReturn | [null, null] = initProgram(gl, vShader, fShader)
     if(!program || aVertexPosition) return;
 
+    const [indexBuffer, vao] = initVAO(gl, vertices, indices, aVertexPosition)
+
     // draw
-    if(!vBuffer || !iBuffer) return;
-    draw(gl, vBuffer, iBuffer, aVertexPosition, indices.length)
+    // if(!vBuffer || !iBuffer) return;
+    // draw(gl, vBuffer, iBuffer, aVertexPosition, indices.length)
+    if(!indexBuffer || !vao) return;
+    drawWithVAO(gl, vao, indexBuffer, indices.length)
 }
 
 export default drawPentagon
