@@ -17,7 +17,7 @@ const initVAO = (gl: WebGL2RenderingContext, vertices: number[], indices: number
     gl.bindBuffer(gl.ARRAY_BUFFER, null)
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
 
-    return vao
+    return [iBuffer, vao]
 }
 
 export default initVAO
