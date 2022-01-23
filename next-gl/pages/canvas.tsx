@@ -14,8 +14,15 @@ const Canvas: NextPage = () => {
     useEffect(() => {
         const canvas = document.getElementById("canvas") as HTMLCanvasElement
         setGl(canvas?.getContext('webgl2'))
+        
+        const resizeCanvas = () => {
+          console.log("resized.")
+          canvas.width = window.innerWidth
+          canvas.height = window.innerHeight
+        }
+        // resizeCanvas()
 
-        document.addEventListener("keydown", (event) => {
+        const keydownCallBack = (event: any) => {
             if(!gl) return
             
             clearColor(gl, checkKey(event.keyCode))
@@ -24,7 +31,15 @@ const Canvas: NextPage = () => {
               if(event.keyCode === 51) drawSquare(gl)
               else if(event.keyCode === 52) drawPentagon(gl)
             }
-        })
+        }
+        
+        document.addEventListener("keydown", keydownCallBack);
+        document.addEventListener("resize", resizeCanvas)
+
+        return () =>{
+          document.removeEventListener("keydown", keydownCallBack)
+          document.removeEventListener("resize", resizeCanvas)
+        }
     })
   return (
     <div className={styles.container}>
