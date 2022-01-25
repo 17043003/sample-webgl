@@ -6,6 +6,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./:/usr/src/app
-    command: sh -c "cd next-gl && yarn dev"
+    command: sh -c "yarn dev"
     ports:
       - "3000:3000"

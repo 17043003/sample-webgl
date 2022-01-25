@@ -1,2 +1,2 @@
 FROM node:14.17.0
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/next-gl
