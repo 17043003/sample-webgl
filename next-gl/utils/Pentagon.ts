@@ -51,7 +51,7 @@ const drawPentagon = (gl: WebGL2RenderingContext) => {
     if(!fShader) return;
 
     const [program, aVertexPosition]: programReturn | [null, null] = initProgram(gl, vShader, fShader)
-    if(!program || aVertexPosition) return;
+    if(!program || aVertexPosition === null) return;
 
     const [indexBuffer, vao] = initVAO(gl, vertices, indices, aVertexPosition)
 
