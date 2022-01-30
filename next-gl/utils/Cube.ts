@@ -78,7 +78,7 @@ const Cube = (gl: WebGL2RenderingContext) => {
     if(!fShader) return;
 
     const [program, aVertexPosition]: programReturn | [null, null] = initProgram(gl, vShader, fShader)
-    if(!program || !aVertexPosition) return;
+    if(!program || aVertexPosition == null) return;
 
     const [indexBuffer, vao] = initVAOBuffer(gl, vertices.map((it) => it * 0.3 ), indices, aVertexPosition)
 
