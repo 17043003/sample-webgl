@@ -6,8 +6,8 @@ import { useState, useEffect } from 'react'
 
 import clearColor from "../utils/ClearColor"
 import checkKey from "../utils/CheckKey"
-import drawSquare from "../utils/Square"
-import drawPentagon from "../utils/Pentagon"
+import drawSquare from "../figures/Square"
+import drawPentagon from "../figures/Pentagon"
 
 const Canvas: NextPage = () => {
     const [gl, setGl] = useState<WebGL2RenderingContext | null>(null)

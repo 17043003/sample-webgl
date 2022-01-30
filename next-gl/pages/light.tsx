@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { useState, useEffect } from 'react'
-import drawCube from "../utils/Cube"
+import drawCube from "../figures/Cube"
 
 const Light: NextPage = () => {
     const [gl, setGl] = useState<WebGL2RenderingContext | null>(null)

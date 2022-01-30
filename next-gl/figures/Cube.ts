@@ -1,7 +1,7 @@
-import prepareShader from "./prepareShader"
-import initProgram, { programReturn } from "./initProgram"
-import initVAOBuffer from "./initVAOBuffer"
-import draw from "./drawWithVAO"
+import prepareShader from "../utils/prepareShader"
+import initProgram, { programReturn } from "../utils/initProgram"
+import initVAOBuffer from "../utils/initVAOBuffer"
+import draw from "../utils/drawWithVAO"
 
 const Cube = (gl: WebGL2RenderingContext) => {
     const vertices = [
