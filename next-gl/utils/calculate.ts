@@ -8,6 +8,10 @@ const calculateNormal = (vertices: number[], indices: number[]) => {
         const v2 = [0, 1, 2].map((it) => {
             return vertices[3 * indices[i] + it] - vertices[3 * indices[i + 1] + it];
         });
+
+        const normal = [0, 1, 2].map((it) => {
+            return v1[(it + 1) % 3] * v2[(it + 2) % 3] - v1[(it + 2) % 3] * v2[(it + 1) % 3];
+        })
     }
 }
 
