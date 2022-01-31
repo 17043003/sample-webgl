@@ -64,10 +64,27 @@ const wall = (gl: WebGL2RenderingContext) => {
     gl.useProgram(program)
 
     const aVertexPosition = gl.getAttribLocation(program, 'aVertexPosition')
+    const aColorLocation = gl.getAttribLocation(program, 'aVertexColor')
 
-    // init buffer
-    const [indexBuffer, vao] = initVAO(gl, vertices, indices, aVertexPosition)
+    const vao = gl.createVertexArray()
+    gl.bindVertexArray(vao)
+
+    const vBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
     
+    gl.enableVertexAttribArray(aVertexPosition)
+    gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, false, 0, 0)
+
+    const indexBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW)
+
+    gl.bindVertexArray(null)
+    gl.bindBuffer(gl.ARRAY_BUFFER, null)
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
+    
+
     if(!indexBuffer || !vao) return;
     draw(gl, vao, indexBuffer, indices.length)
 }
