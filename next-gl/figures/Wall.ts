@@ -1,6 +1,7 @@
 import prepareShader from "../utils/prepareShader"
 import initVAO from "../utils/initVAOBuffer"
 import draw from "../utils/drawWithVAO"
+import { calculateNormal } from "../utils/calculate"
 
 const wall = (gl: WebGL2RenderingContext) => {
     const vertices = [
@@ -22,6 +23,8 @@ const wall = (gl: WebGL2RenderingContext) => {
         2, 7, 6,
         3, 7, 2
     ];
+
+    const normals = calculateNormal(vertices, indices);
 
     // prepare shader
     const vertexShader = `#version 300 es
