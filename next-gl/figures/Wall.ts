@@ -4,10 +4,13 @@ import draw from "../utils/drawWithVAO"
 import { calculateNormal } from "../utils/calculate"
 import { mat4 } from "gl-matrix"
 
+type Location = { [key: string]: number}
+type ULocation = { [key: string]: WebGLUniformLocation | null }
+
 interface WebGLProgramWithLoc {
     program: WebGLProgram | null
-    location: { [key: string]: number}
-    uLocation: { [key: string]: WebGLUniformLocation | null }
+    location: Location
+    uLocation: ULocation
 }
 
 const wall = (gl: WebGL2RenderingContext) => {
@@ -87,8 +90,8 @@ const wall = (gl: WebGL2RenderingContext) => {
 
     // create program
     const program = gl.createProgram()
-    const location: { [key: string]: number} = {};
-    const uLocation: { [key: string]: WebGLUniformLocation | null } = {}
+    const location: Location = {};
+    const uLocation: ULocation = {}
     if(!program) return [null, null];
     gl.attachShader(program, vShader)
     gl.attachShader(program, fShader)
