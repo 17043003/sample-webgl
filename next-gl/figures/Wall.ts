@@ -36,6 +36,13 @@ const wall = (gl: WebGL2RenderingContext) => {
 
     const normals = calculateNormal(vertices, indices);
 
+    if(gl !== null){
+        gl.clearColor(0.9, 0.9, 0.9, 1);
+        gl.clearDepth(100);
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
+    }
+
     // prepare shader
     const vertexShader = `#version 300 es
     precision mediump float;
@@ -73,12 +80,12 @@ const wall = (gl: WebGL2RenderingContext) => {
     const fragmentShader = `#version 300 es
     precision mediump float;
 
+    in vec4 vVertexColor;
     // Color that is the result of this shader
     out vec4 fragColor;
 
     void main(void) {
-      // Set the result as red
-      fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+      fragColor = vVertexColor;
     }
     `
 
@@ -112,12 +119,6 @@ const wall = (gl: WebGL2RenderingContext) => {
 
     const programWithLoc: WebGLProgramWithLoc = { program, location, uLocation };
 
-    // init light
-    gl.uniform3fv(uLocation["uLightDirection"], [0, 0, -1]);
-    gl.uniform4fv(uLocation["uLightAmbient"], [0.01, 0.01, 0.01, 1]);
-    gl.uniform4fv(uLocation["uLightDiffuse"], [0.5, 0.5, 0.5, 1]);
-    gl.uniform4f(uLocation["uMaterialDiffuse"], 0.1, 0.5, 0.8, 1);
-
     const vao = gl.createVertexArray()
     gl.bindVertexArray(vao)
 
@@ -143,12 +144,20 @@ const wall = (gl: WebGL2RenderingContext) => {
     gl.bindVertexArray(null)
     gl.bindBuffer(gl.ARRAY_BUFFER, null)
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
+
+    // init light
+    gl.uniform3fv(uLocation["uLightDirection"], [0, 0, -1]);
+    gl.uniform4fv(uLocation["uLightAmbient"], [0.01, 0.01, 0.01, 1]);
+    gl.uniform4fv(uLocation["uLightDiffuse"], [0.5, 0.5, 0.5, 1]);
+    gl.uniform4f(uLocation["uMaterialDiffuse"], 0.1, 0.5, 0.8, 1);
     
     const modelViewMatrix = mat4.create();
     const projectionMatrix = mat4.create();
     const normalMatrix = mat4.create();
 
     const { width, height } = gl.canvas;
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
     mat4.perspective(projectionMatrix, 45, width / height, 0.1, 10000);
     mat4.identity(modelViewMatrix);
     mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -40]);
