@@ -13,36 +13,7 @@ interface WebGLProgramWithLoc {
     uLocation: ULocation
 }
 
-const wall = (gl: WebGL2RenderingContext) => {
-    const vertices = [
-        -20, -8, 20,
-        -10, -8, 0,
-        10, -8, 0,
-        20, -8, 20,
-        -20, 8, 20,
-        -10, 8, 0,
-        10, 8, 0,
-        20, 8, 20
-    ];
-
-    const indices = [
-        0, 5, 4,
-        1, 5, 0,
-        1, 6, 5,
-        2, 6, 1,
-        2, 7, 6,
-        3, 7, 2
-    ];
-
-    const normals = calculateNormal(vertices, indices);
-
-    if(gl !== null){
-        gl.clearColor(0.9, 0.9, 0.9, 1);
-        gl.clearDepth(100);
-        gl.enable(gl.DEPTH_TEST);
-        gl.depthFunc(gl.LEQUAL);
-    }
-
+const initProgram = (gl: WebGL2RenderingContext): WebGLProgramWithLoc => {
     // prepare shader
     const vertexShader = `#version 300 es
     precision mediump float;
@@ -118,6 +89,40 @@ const wall = (gl: WebGL2RenderingContext) => {
     uLocation["uMaterialDiffuse"] = gl.getUniformLocation(program, 'uMaterialDiffuse');
 
     const programWithLoc: WebGLProgramWithLoc = { program, location, uLocation };
+    return programWithLoc;
+}
+
+const wall = (gl: WebGL2RenderingContext) => {
+    const vertices = [
+        -20, -8, 20,
+        -10, -8, 0,
+        10, -8, 0,
+        20, -8, 20,
+        -20, 8, 20,
+        -10, 8, 0,
+        10, 8, 0,
+        20, 8, 20
+    ];
+
+    const indices = [
+        0, 5, 4,
+        1, 5, 0,
+        1, 6, 5,
+        2, 6, 1,
+        2, 7, 6,
+        3, 7, 2
+    ];
+
+    const normals = calculateNormal(vertices, indices);
+
+    if(gl !== null){
+        gl.clearColor(0.9, 0.9, 0.9, 1);
+        gl.clearDepth(100);
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
+    }
+
+    const pl: WebGLProgramWithLoc = initProgram(gl);
 
     const vao = gl.createVertexArray()
     gl.bindVertexArray(vao)
@@ -126,16 +131,16 @@ const wall = (gl: WebGL2RenderingContext) => {
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
     
-    gl.enableVertexAttribArray(location["aVertexPosition"])
-    gl.vertexAttribPointer(location["aVertexPosition"], 3, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(pl.location["aVertexPosition"])
+    gl.vertexAttribPointer(pl.location["aVertexPosition"], 3, gl.FLOAT, false, 0, 0)
 
     // normals
     const normalsBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
 
-    gl.enableVertexAttribArray(location["aVertexNormal"]);
-    gl.vertexAttribPointer(location["aVertexNormal"], 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(pl.location["aVertexNormal"]);
+    gl.vertexAttribPointer(pl.location["aVertexNormal"], 3, gl.FLOAT, false, 0, 0);
 
     const indexBuffer = gl.createBuffer()
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
@@ -146,10 +151,10 @@ const wall = (gl: WebGL2RenderingContext) => {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
 
     // init light
-    gl.uniform3fv(uLocation["uLightDirection"], [0, 0, -1]);
-    gl.uniform4fv(uLocation["uLightAmbient"], [0.01, 0.01, 0.01, 1]);
-    gl.uniform4fv(uLocation["uLightDiffuse"], [0.5, 0.5, 0.5, 1]);
-    gl.uniform4f(uLocation["uMaterialDiffuse"], 0.1, 0.5, 0.8, 1);
+    gl.uniform3fv(pl.uLocation["uLightDirection"], [0, 0, -1]);
+    gl.uniform4fv(pl.uLocation["uLightAmbient"], [0.01, 0.01, 0.01, 1]);
+    gl.uniform4fv(pl.uLocation["uLightDiffuse"], [0.5, 0.5, 0.5, 1]);
+    gl.uniform4f(pl.uLocation["uMaterialDiffuse"], 0.1, 0.5, 0.8, 1);
     
     const modelViewMatrix = mat4.create();
     const projectionMatrix = mat4.create();
@@ -166,9 +171,9 @@ const wall = (gl: WebGL2RenderingContext) => {
     mat4.invert(normalMatrix, normalMatrix);
     mat4.transpose(normalMatrix, normalMatrix);
 
-    gl.uniformMatrix4fv(uLocation["uModelViewMatrix"], false, modelViewMatrix);
-    gl.uniformMatrix4fv(uLocation["uProjectionMatrix"], false, projectionMatrix);
-    gl.uniformMatrix4fv(uLocation["uNormalMatrix"], false, normalMatrix);
+    gl.uniformMatrix4fv(pl.uLocation["uModelViewMatrix"], false, modelViewMatrix);
+    gl.uniformMatrix4fv(pl.uLocation["uProjectionMatrix"], false, projectionMatrix);
+    gl.uniformMatrix4fv(pl.uLocation["uNormalMatrix"], false, normalMatrix);
 
     // draw
     if(!indexBuffer || !vao) return;
