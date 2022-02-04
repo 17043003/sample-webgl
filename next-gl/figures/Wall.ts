@@ -13,7 +13,7 @@ interface WebGLProgramWithLoc {
     uLocation: ULocation
 }
 
-const initProgram = (gl: WebGL2RenderingContext): WebGLProgramWithLoc => {
+const initProgram = (gl: WebGL2RenderingContext): WebGLProgramWithLoc | null => {
     // prepare shader
     const vertexShader = `#version 300 es
     precision mediump float;
@@ -61,16 +61,16 @@ const initProgram = (gl: WebGL2RenderingContext): WebGLProgramWithLoc => {
     `
 
     const vShader = prepareShader(gl, "vertex", vertexShader)
-    if(!vShader) return;
+    if(!vShader) return null;
 
     const fShader = prepareShader(gl, "fragment", fragmentShader)
-    if(!fShader) return;
+    if(!fShader) return null;
 
     // create program
     const program = gl.createProgram()
     const location: Location = {};
     const uLocation: ULocation = {}
-    if(!program) return [null, null];
+    if(!program) return null;
     gl.attachShader(program, vShader)
     gl.attachShader(program, fShader)
     gl.linkProgram(program)
@@ -122,7 +122,8 @@ const wall = (gl: WebGL2RenderingContext) => {
         gl.depthFunc(gl.LEQUAL);
     }
 
-    const pl: WebGLProgramWithLoc = initProgram(gl);
+    const pl: WebGLProgramWithLoc | null = initProgram(gl);
+    if(pl === null) return;
 
     const vao = gl.createVertexArray()
     gl.bindVertexArray(vao)
