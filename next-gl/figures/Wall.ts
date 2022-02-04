@@ -92,6 +92,36 @@ const initProgram = (gl: WebGL2RenderingContext): WebGLProgramWithLoc | null => 
     return programWithLoc;
 }
 
+const initBuffer = (gl: WebGL2RenderingContext, pl: WebGLProgramWithLoc, vertices: number[], normals: number[], indices: number[]) => {
+    const vao = gl.createVertexArray()
+    gl.bindVertexArray(vao)
+
+    const vBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
+    
+    gl.enableVertexAttribArray(pl.location["aVertexPosition"])
+    gl.vertexAttribPointer(pl.location["aVertexPosition"], 3, gl.FLOAT, false, 0, 0)
+
+    // normals
+    const normalsBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+
+    gl.enableVertexAttribArray(pl.location["aVertexNormal"]);
+    gl.vertexAttribPointer(pl.location["aVertexNormal"], 3, gl.FLOAT, false, 0, 0);
+
+    const indexBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW)
+
+    gl.bindVertexArray(null)
+    gl.bindBuffer(gl.ARRAY_BUFFER, null)
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
+
+    return [vao, indexBuffer];
+}
+
 const wall = (gl: WebGL2RenderingContext) => {
     const vertices = [
         -20, -8, 20,
@@ -125,31 +155,7 @@ const wall = (gl: WebGL2RenderingContext) => {
     const pl: WebGLProgramWithLoc | null = initProgram(gl);
     if(pl === null) return;
 
-    const vao = gl.createVertexArray()
-    gl.bindVertexArray(vao)
-
-    const vBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
-    
-    gl.enableVertexAttribArray(pl.location["aVertexPosition"])
-    gl.vertexAttribPointer(pl.location["aVertexPosition"], 3, gl.FLOAT, false, 0, 0)
-
-    // normals
-    const normalsBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-
-    gl.enableVertexAttribArray(pl.location["aVertexNormal"]);
-    gl.vertexAttribPointer(pl.location["aVertexNormal"], 3, gl.FLOAT, false, 0, 0);
-
-    const indexBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW)
-
-    gl.bindVertexArray(null)
-    gl.bindBuffer(gl.ARRAY_BUFFER, null)
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
+    const [vao, indexBuffer] = initBuffer(gl, pl, vertices, normals, indices);
 
     // init light
     gl.uniform3fv(pl.uLocation["uLightDirection"], [0, 0, -1]);
