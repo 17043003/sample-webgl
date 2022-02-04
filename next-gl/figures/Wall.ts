@@ -122,6 +122,14 @@ const initBuffer = (gl: WebGL2RenderingContext, pl: WebGLProgramWithLoc, vertice
     return [vao, indexBuffer];
 }
 
+// init light
+const initLight = (gl: WebGL2RenderingContext, pl: WebGLProgramWithLoc) => {
+    gl.uniform3fv(pl.uLocation["uLightDirection"], [0, 0, -1]);
+    gl.uniform4fv(pl.uLocation["uLightAmbient"], [0.01, 0.01, 0.01, 1]);
+    gl.uniform4fv(pl.uLocation["uLightDiffuse"], [0.5, 0.5, 0.5, 1]);
+    gl.uniform4f(pl.uLocation["uMaterialDiffuse"], 0.1, 0.5, 0.8, 1);
+}
+
 const wall = (gl: WebGL2RenderingContext) => {
     const vertices = [
         -20, -8, 20,
@@ -157,11 +165,7 @@ const wall = (gl: WebGL2RenderingContext) => {
 
     const [vao, indexBuffer] = initBuffer(gl, pl, vertices, normals, indices);
 
-    // init light
-    gl.uniform3fv(pl.uLocation["uLightDirection"], [0, 0, -1]);
-    gl.uniform4fv(pl.uLocation["uLightAmbient"], [0.01, 0.01, 0.01, 1]);
-    gl.uniform4fv(pl.uLocation["uLightDiffuse"], [0.5, 0.5, 0.5, 1]);
-    gl.uniform4f(pl.uLocation["uMaterialDiffuse"], 0.1, 0.5, 0.8, 1);
+    initLight(gl, pl);
     
     const modelViewMatrix = mat4.create();
     const projectionMatrix = mat4.create();
