@@ -1,15 +1,19 @@
 import { NextPage } from "next";
 import { useState, useEffect } from 'react'
 import drawCube from "../figures/Cube"
-import drawWall from "../figures/Wall"
+import Wall from "../figures/Wall";
 
 const Light: NextPage = () => {
     const [gl, setGl] = useState<WebGL2RenderingContext | null>(null)
     const [count, setCount] = useState(0)
+    let wall: Wall;
 
     useEffect(() => {
         const canvas = document.getElementById("canvas") as HTMLCanvasElement
         setGl(canvas?.getContext('webgl2'))
+
+        if(gl === null) return;
+        wall = new Wall(gl)
 
         const resizeCanvas = () => {
           canvas.width = window.innerWidth
@@ -19,7 +23,12 @@ const Light: NextPage = () => {
         const keydownCallBack = (event: any) => {
             if(!gl) return
 
-            if(event.keyCode === 49) drawWall(gl)
+            wall.setLight(event.keyCode)
+            wall.draw()
+
+            if(event.keyCode === 49) {
+                wall.initMaterial(gl);
+            }
             if(event.keyCode === 50) drawCube(gl)
             else return
         }

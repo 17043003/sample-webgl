@@ -13,182 +13,218 @@ interface WebGLProgramWithLoc {
     uLocation: ULocation
 }
 
-const initProgram = (gl: WebGL2RenderingContext): WebGLProgramWithLoc | null => {
-    // prepare shader
-    const vertexShader = `#version 300 es
-    precision mediump float;
-
-    uniform mat4 uModelViewMatrix;
-    uniform mat4 uProjectionMatrix;
-    uniform mat4 uNormalMatrix;
-    uniform vec3 uLightDirection;
-    uniform vec4 uLightAmbient;
-    uniform vec4 uLightDiffuse;
-    uniform vec4 uMaterialDiffuse;
-
-    // Supplied vertex position attribute
-    in vec3 aVertexPosition;
-    in vec3 aVertexNormal;
-
-    out vec4 vVertexColor;
-
-    void main(void) {
-        vec3 N = vec3(uNormalMatrix * vec4(aVertexNormal, 1.0));
-        vec3 L = normalize(uLightDirection);
-        float lambertTerm = dot(N, -L);
-
-        // Ambient
-        vec4 Ia = uLightAmbient;
-        // Diffuse
-        vec4 Id = uMaterialDiffuse * uLightDiffuse * lambertTerm;
-
-        // Set varying to be used inside of fragment shader
-        vVertexColor = vec4(vec3(Ia + Id), 1.0);
-        gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);
+class Wall{
+    gl: WebGL2RenderingContext;
+    pl: WebGLProgramWithLoc | null;
+    vao: WebGLVertexArrayObject | null;
+    indexBuffer: WebGLVertexArrayObject | null;
+    indicesLength: number;
+    constructor(gl: WebGL2RenderingContext){
+        this.gl = gl;
+        this.pl = null;
+        this.vao = null;
+        this.indexBuffer = null;
+        this.indicesLength = 0;
     }
-    `
+    initProgram = (gl: WebGL2RenderingContext): WebGLProgramWithLoc | null => {
+        // prepare shader
+        const vertexShader = `#version 300 es
+        precision mediump float;
 
-    const fragmentShader = `#version 300 es
-    precision mediump float;
+        uniform mat4 uModelViewMatrix;
+        uniform mat4 uProjectionMatrix;
+        uniform mat4 uNormalMatrix;
+        uniform vec3 uLightDirection;
+        uniform vec4 uLightAmbient;
+        uniform vec4 uLightDiffuse;
+        uniform vec4 uMaterialDiffuse;
 
-    in vec4 vVertexColor;
-    // Color that is the result of this shader
-    out vec4 fragColor;
+        // Supplied vertex position attribute
+        in vec3 aVertexPosition;
+        in vec3 aVertexNormal;
 
-    void main(void) {
-      fragColor = vVertexColor;
-    }
-    `
+        out vec4 vVertexColor;
 
-    const vShader = prepareShader(gl, "vertex", vertexShader)
-    if(!vShader) return null;
+        void main(void) {
+            vec3 N = vec3(uNormalMatrix * vec4(aVertexNormal, 1.0));
+            vec3 L = normalize(uLightDirection);
+            float lambertTerm = dot(N, -L);
 
-    const fShader = prepareShader(gl, "fragment", fragmentShader)
-    if(!fShader) return null;
+            // Ambient
+            vec4 Ia = uLightAmbient;
+            // Diffuse
+            vec4 Id = uMaterialDiffuse * uLightDiffuse * lambertTerm;
 
-    // create program
-    const program = gl.createProgram()
-    const location: Location = {};
-    const uLocation: ULocation = {}
-    if(!program) return null;
-    gl.attachShader(program, vShader)
-    gl.attachShader(program, fShader)
-    gl.linkProgram(program)
+            // Set varying to be used inside of fragment shader
+            vVertexColor = vec4(vec3(Ia + Id), 1.0);
+            gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);
+        }
+        `
 
-    gl.useProgram(program)
+        const fragmentShader = `#version 300 es
+        precision mediump float;
 
-    location["aVertexPosition"] = gl.getAttribLocation(program, 'aVertexPosition')
-    location["aVertexNormal"] = gl.getAttribLocation(program, "aVertexNormal")
+        in vec4 vVertexColor;
+        // Color that is the result of this shader
+        out vec4 fragColor;
 
-    uLocation["uProjectionMatrix"] = gl.getUniformLocation(program, 'uProjectionMatrix');
-    uLocation["uModelViewMatrix"] = gl.getUniformLocation(program, 'uModelViewMatrix');
-    uLocation["uNormalMatrix"] = gl.getUniformLocation(program, 'uNormalMatrix');
-    uLocation["uLightDirection"] = gl.getUniformLocation(program, 'uLightDirection');
-    uLocation["uLightAmbient"] = gl.getUniformLocation(program, 'uLightAmbient');
-    uLocation["uLightDiffuse"] = gl.getUniformLocation(program, 'uLightDiffuse');
-    uLocation["uMaterialDiffuse"] = gl.getUniformLocation(program, 'uMaterialDiffuse');
+        void main(void) {
+        fragColor = vVertexColor;
+        }
+        `
 
-    const programWithLoc: WebGLProgramWithLoc = { program, location, uLocation };
-    return programWithLoc;
-}
+        const vShader = prepareShader(gl, "vertex", vertexShader)
+        if(!vShader) return null;
 
-const initBuffer = (gl: WebGL2RenderingContext, pl: WebGLProgramWithLoc, vertices: number[], normals: number[], indices: number[]) => {
-    const vao = gl.createVertexArray()
-    gl.bindVertexArray(vao)
+        const fShader = prepareShader(gl, "fragment", fragmentShader)
+        if(!fShader) return null;
 
-    const vBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
-    
-    gl.enableVertexAttribArray(pl.location["aVertexPosition"])
-    gl.vertexAttribPointer(pl.location["aVertexPosition"], 3, gl.FLOAT, false, 0, 0)
+        // create program
+        const program = gl.createProgram()
+        const location: Location = {};
+        const uLocation: ULocation = {}
+        if(!program) return null;
+        gl.attachShader(program, vShader)
+        gl.attachShader(program, fShader)
+        gl.linkProgram(program)
 
-    // normals
-    const normalsBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+        gl.useProgram(program)
 
-    gl.enableVertexAttribArray(pl.location["aVertexNormal"]);
-    gl.vertexAttribPointer(pl.location["aVertexNormal"], 3, gl.FLOAT, false, 0, 0);
+        location["aVertexPosition"] = gl.getAttribLocation(program, 'aVertexPosition')
+        location["aVertexNormal"] = gl.getAttribLocation(program, "aVertexNormal")
 
-    const indexBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW)
+        uLocation["uProjectionMatrix"] = gl.getUniformLocation(program, 'uProjectionMatrix');
+        uLocation["uModelViewMatrix"] = gl.getUniformLocation(program, 'uModelViewMatrix');
+        uLocation["uNormalMatrix"] = gl.getUniformLocation(program, 'uNormalMatrix');
+        uLocation["uLightDirection"] = gl.getUniformLocation(program, 'uLightDirection');
+        uLocation["uLightAmbient"] = gl.getUniformLocation(program, 'uLightAmbient');
+        uLocation["uLightDiffuse"] = gl.getUniformLocation(program, 'uLightDiffuse');
+        uLocation["uMaterialDiffuse"] = gl.getUniformLocation(program, 'uMaterialDiffuse');
 
-    gl.bindVertexArray(null)
-    gl.bindBuffer(gl.ARRAY_BUFFER, null)
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
-
-    return [vao, indexBuffer];
-}
-
-// init light
-const initLight = (gl: WebGL2RenderingContext, pl: WebGLProgramWithLoc) => {
-    gl.uniform3fv(pl.uLocation["uLightDirection"], [0, 0, -1]);
-    gl.uniform4fv(pl.uLocation["uLightAmbient"], [0.01, 0.01, 0.01, 1]);
-    gl.uniform4fv(pl.uLocation["uLightDiffuse"], [0.5, 0.5, 0.5, 1]);
-    gl.uniform4f(pl.uLocation["uMaterialDiffuse"], 0.1, 0.5, 0.8, 1);
-}
-
-const wall = (gl: WebGL2RenderingContext) => {
-    const vertices = [
-        -20, -8, 20,
-        -10, -8, 0,
-        10, -8, 0,
-        20, -8, 20,
-        -20, 8, 20,
-        -10, 8, 0,
-        10, 8, 0,
-        20, 8, 20
-    ];
-
-    const indices = [
-        0, 5, 4,
-        1, 5, 0,
-        1, 6, 5,
-        2, 6, 1,
-        2, 7, 6,
-        3, 7, 2
-    ];
-
-    const normals = calculateNormal(vertices, indices);
-
-    if(gl !== null){
-        gl.clearColor(0.9, 0.9, 0.9, 1);
-        gl.clearDepth(100);
-        gl.enable(gl.DEPTH_TEST);
-        gl.depthFunc(gl.LEQUAL);
+        const programWithLoc: WebGLProgramWithLoc = { program, location, uLocation };
+        return programWithLoc;
     }
 
-    const pl: WebGLProgramWithLoc | null = initProgram(gl);
-    if(pl === null) return;
+    initBuffer = (gl: WebGL2RenderingContext, pl: WebGLProgramWithLoc, vertices: number[], normals: number[], indices: number[]) => {
+        const vao = gl.createVertexArray()
+        gl.bindVertexArray(vao)
 
-    const [vao, indexBuffer] = initBuffer(gl, pl, vertices, normals, indices);
+        const vBuffer = gl.createBuffer()
+        gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
+        
+        gl.enableVertexAttribArray(pl.location["aVertexPosition"])
+        gl.vertexAttribPointer(pl.location["aVertexPosition"], 3, gl.FLOAT, false, 0, 0)
 
-    initLight(gl, pl);
-    
-    const modelViewMatrix = mat4.create();
-    const projectionMatrix = mat4.create();
-    const normalMatrix = mat4.create();
+        // normals
+        const normalsBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
 
-    const { width, height } = gl.canvas;
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.enableVertexAttribArray(pl.location["aVertexNormal"]);
+        gl.vertexAttribPointer(pl.location["aVertexNormal"], 3, gl.FLOAT, false, 0, 0);
 
-    mat4.perspective(projectionMatrix, 45, width / height, 0.1, 10000);
-    mat4.identity(modelViewMatrix);
-    mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -40]);
+        const indexBuffer = gl.createBuffer()
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW)
 
-    mat4.copy(normalMatrix, modelViewMatrix);
-    mat4.invert(normalMatrix, normalMatrix);
-    mat4.transpose(normalMatrix, normalMatrix);
+        gl.bindVertexArray(null)
+        gl.bindBuffer(gl.ARRAY_BUFFER, null)
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
 
-    gl.uniformMatrix4fv(pl.uLocation["uModelViewMatrix"], false, modelViewMatrix);
-    gl.uniformMatrix4fv(pl.uLocation["uProjectionMatrix"], false, projectionMatrix);
-    gl.uniformMatrix4fv(pl.uLocation["uNormalMatrix"], false, normalMatrix);
+        return [vao, indexBuffer];
+    }
 
-    // draw
-    if(!indexBuffer || !vao) return;
-    draw(gl, vao, indexBuffer, indices.length)
+    // init light
+    initLight = (gl: WebGL2RenderingContext, pl: WebGLProgramWithLoc) => {
+        gl.uniform3fv(pl.uLocation["uLightDirection"], [0, 0, -1]);
+        gl.uniform4fv(pl.uLocation["uLightAmbient"], [0.01, 0.01, 0.01, 1]);
+        gl.uniform4fv(pl.uLocation["uLightDiffuse"], [0.5, 0.5, 0.5, 1]);
+        gl.uniform4f(pl.uLocation["uMaterialDiffuse"], 0.1, 0.5, 0.8, 1);
+    }
+
+    initMaterial = (gl: WebGL2RenderingContext) => {
+        const vertices = [
+            -20, -8, 20,
+            -10, -8, 0,
+            10, -8, 0,
+            20, -8, 20,
+            -20, 8, 20,
+            -10, 8, 0,
+            10, 8, 0,
+            20, 8, 20
+        ];
+
+        const indices = [
+            0, 5, 4,
+            1, 5, 0,
+            1, 6, 5,
+            2, 6, 1,
+            2, 7, 6,
+            3, 7, 2
+        ];
+
+        const normals = calculateNormal(vertices, indices);
+
+        if(gl !== null){
+            gl.clearColor(0.9, 0.9, 0.9, 1);
+            gl.clearDepth(100);
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.LEQUAL);
+        }
+
+        const pl: WebGLProgramWithLoc | null = this.initProgram(gl);
+        if(pl === null) return;
+
+        const [vao, indexBuffer] = this.initBuffer(gl, pl, vertices, normals, indices);
+
+        this.initLight(gl, pl);
+        
+        const modelViewMatrix = mat4.create();
+        const projectionMatrix = mat4.create();
+        const normalMatrix = mat4.create();
+
+        const { width, height } = gl.canvas;
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        mat4.perspective(projectionMatrix, 45, width / height, 0.1, 10000);
+        mat4.identity(modelViewMatrix);
+        mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -40]);
+
+        mat4.copy(normalMatrix, modelViewMatrix);
+        mat4.invert(normalMatrix, normalMatrix);
+        mat4.transpose(normalMatrix, normalMatrix);
+
+        gl.uniformMatrix4fv(pl.uLocation["uModelViewMatrix"], false, modelViewMatrix);
+        gl.uniformMatrix4fv(pl.uLocation["uProjectionMatrix"], false, projectionMatrix);
+        gl.uniformMatrix4fv(pl.uLocation["uNormalMatrix"], false, normalMatrix);
+
+        // draw
+        if(!indexBuffer || !vao) return;
+        draw(gl, vao, indexBuffer, indices.length)
+
+        this.gl = gl;
+        this.pl = pl;
+        this.vao = vao;
+        this.indexBuffer = indexBuffer;
+        this.indicesLength = indices.length;
+    }
+
+    setLight = (keycode: number) => {
+        this.initMaterial(this.gl)
+        if(this.pl === null) return
+        if(keycode === 37) {
+            this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [0.7, 0, -1]);
+        }
+
+        if(this.vao === null || this.indexBuffer === null) return;
+        draw(this.gl, this.vao, this.indexBuffer, this.indicesLength)
+    }
+
+    draw = () => {
+        if(this.vao === null || this.indexBuffer === null) return;
+        draw(this.gl, this.vao, this.indexBuffer, this.indicesLength);
+    }
 }
 
-export default wall;
+export default Wall;
