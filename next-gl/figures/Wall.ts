@@ -213,12 +213,18 @@ class Wall{
     }
 
     setLight = (keycode: number) => {
-        this.initMaterial(this.gl)
         if(this.pl === null) return
-        if(keycode === 37) {
-            this.lightDirection -= 0.1
-            console.log(this.lightDirection)
-            this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [this.lightDirection, 0, -1]);
+        switch(keycode){
+            case 37:
+                this.lightDirection -= 0.1
+                this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [this.lightDirection, 0, -1]);
+                break;
+            case 39:
+                this.lightDirection += 0.1
+                this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [this.lightDirection, 0, -1]);
+                break;
+            default:
+                return;
         }
 
         if(this.vao === null || this.indexBuffer === null) return;
