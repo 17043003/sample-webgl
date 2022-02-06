@@ -19,12 +19,14 @@ class Wall{
     vao: WebGLVertexArrayObject | null;
     indexBuffer: WebGLVertexArrayObject | null;
     indicesLength: number;
+    lightDirection: number;
     constructor(gl: WebGL2RenderingContext){
         this.gl = gl;
         this.pl = null;
         this.vao = null;
         this.indexBuffer = null;
         this.indicesLength = 0;
+        this.lightDirection = 1.0;
     }
     initProgram = (gl: WebGL2RenderingContext): WebGLProgramWithLoc | null => {
         // prepare shader
@@ -214,7 +216,9 @@ class Wall{
         this.initMaterial(this.gl)
         if(this.pl === null) return
         if(keycode === 37) {
-            this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [0.7, 0, -1]);
+            this.lightDirection -= 0.1
+            console.log(this.lightDirection)
+            this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [this.lightDirection, 0, -1]);
         }
 
         if(this.vao === null || this.indexBuffer === null) return;

@@ -5,7 +5,6 @@ import Wall from "../figures/Wall";
 
 const Light: NextPage = () => {
     const [gl, setGl] = useState<WebGL2RenderingContext | null>(null)
-    const [count, setCount] = useState(0)
     let wall: Wall;
 
     useEffect(() => {
@@ -24,7 +23,6 @@ const Light: NextPage = () => {
             if(!gl) return
 
             wall.setLight(event.keyCode)
-            wall.draw()
 
             if(event.keyCode === 49) {
                 wall.initMaterial(gl);
@@ -41,16 +39,6 @@ const Light: NextPage = () => {
           document.removeEventListener("resize", resizeCanvas)
         }
     })
-    useEffect(() => {
-        const loop = () => {
-            setCount((prevCount) => (prevCount+1) % 360)
-        }
-        const intervalId = setInterval(loop, 500)
-        
-        return () => {
-            clearInterval(intervalId)
-        }
-    }, [])
     return(
         <div>
             <canvas id='canvas' width="900" height="700"></canvas>
