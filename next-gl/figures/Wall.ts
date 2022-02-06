@@ -19,14 +19,16 @@ class Wall{
     vao: WebGLVertexArrayObject | null;
     indexBuffer: WebGLVertexArrayObject | null;
     indicesLength: number;
-    lightDirection: number;
+    lightX: number;
+    lightY
     constructor(gl: WebGL2RenderingContext){
         this.gl = gl;
         this.pl = null;
         this.vao = null;
         this.indexBuffer = null;
         this.indicesLength = 0;
-        this.lightDirection = 1.0;
+        this.lightX = 0.0;
+        this.lightY = 0.0;
     }
     initProgram = (gl: WebGL2RenderingContext): WebGLProgramWithLoc | null => {
         // prepare shader
@@ -216,12 +218,20 @@ class Wall{
         if(this.pl === null) return
         switch(keycode){
             case 37:
-                this.lightDirection -= 0.1
-                this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [this.lightDirection, 0, -1]);
+                this.lightX -= 0.1
+                this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [this.lightX, this.lightY, -1]);
                 break;
             case 39:
-                this.lightDirection += 0.1
-                this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [this.lightDirection, 0, -1]);
+                this.lightX += 0.1
+                this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [this.lightX, this.lightY, -1]);
+                break;
+            case 38:
+                this.lightY -= 0.1
+                this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [this.lightX, this.lightY, -1]);
+                break;
+            case 40:
+                this.lightY += 0.1
+                this.gl.uniform3fv(this.pl.uLocation["uLightDirection"], [this.lightX, this.lightY, -1]);
                 break;
             default:
                 return;
